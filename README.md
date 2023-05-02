@@ -38,7 +38,11 @@ npm start
 ```json
 npm run build
 ```
+## For running
 
+```json
+npm run start
+```
 ---
 
 <div align="center">

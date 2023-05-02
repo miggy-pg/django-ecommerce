@@ -1,7 +1,13 @@
 from rest_framework import serializers
 
 from core.models import Item
+from core.models import Order
+from core.models import OrderItem
 
+
+class StringSerializer(serializers.StringRelatedField):
+    def to_internal_value(self, value):
+        return value
 
 class ItemSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
@@ -26,3 +32,47 @@ class ItemSerializer(serializers.ModelSerializer):
     
     def get_label(self, obj):
         return obj.get_label_display()
+    
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    item = StringSerializer()
+    item_obj = serializers.SerializerMethodField()
+    final_price = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OrderItem
+        fields = (
+            'id',
+            'item',
+            'quantity',
+            'item_obj',
+            'final_price',
+        )
+
+    def get_item_obj(self, obj):
+        print('obj: ', obj)
+        return ItemSerializer(obj.item).data
+
+    def get_final_price(self, obj):
+        return obj.get_final_price()
+
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    order_items = serializers.SerializerMethodField()
+    total = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = (
+            'id',
+            'order_items',
+            'total',
+        )
+    
+    def get_order_items(self, obj):
+        return OrderItemSerializer(obj.items.all(), many=True).data
+    
+    def get_total(self, obj):
+        return obj.get_total()
+    

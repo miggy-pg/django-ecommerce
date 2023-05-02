@@ -1,16 +1,11 @@
 import React from 'react'
 import axios from 'axios'
+import { connect } from 'react-redux'
 import { Icon, Container, Image, Item, Label, Button, Segment, Loader, Dimmer, Message } from 'semantic-ui-react'
 import { productListURL, addToCartURL } from '../constants'
 import { authAxios } from '../utils'
+import { fetchCart } from '../store/actions/cart'
 
-<Segment>
-  <Dimmer active inverted>
-    <Loader inverted>Loading</Loader>
-  </Dimmer>
-
-  <Image src='/images/wireframe/short-paragraph.png' />
-</Segment>
 
 class ProductList extends React.Component {
 
@@ -20,27 +15,27 @@ class ProductList extends React.Component {
     data: []
   }
   componentDidMount() {
-    this.setState({ loading: true })
+    this.setState({ loading: true });
     axios.get(productListURL)
       .then(res => {
         console.log(res.data);
-        this.setState({ data: res.data, loading: false })
+        this.setState({ data: res.data, loading: false });
       })
       .catch(err => {
-        this.setState({ error: err, loading: false })
+        this.setState({ error: err, loading: false });
       })
   }
 
   handleAddToCart = slug => {
-    this.setState({ loading: true })
+    this.setState({ loading: true });
     authAxios.post(addToCartURL, { slug })
       .then(res => {
         console.log(res.data);
-        // update the cart count  
-        this.setState({ loading: false })
+        this.props.fetchCart(); // update the cart count  
+        this.setState({ loading: false });
       })
       .catch(err => {
-        this.setState({ error: err, loading: false })
+        this.setState({ error: err, loading: false });
       })
   }
 
@@ -98,5 +93,10 @@ class ProductList extends React.Component {
   }
 }
 
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchCart: () => dispatch(fetchCart())
+  }
+}
 
-export default ProductList
+export default connect(null, mapDispatchToProps)(ProductList);
